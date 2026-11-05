@@ -1,4 +1,4 @@
-global using appEmpamedic.Data;
+global using appEmpamedic.Models;
 global using appEmpamedic.PageModels;
 global using appEmpamedic.Pages;
 global using appEmpamedic.Services;

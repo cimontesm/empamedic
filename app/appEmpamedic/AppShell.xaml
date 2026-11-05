@@ -6,29 +6,42 @@
     xmlns:sf="clr-namespace:Syncfusion.Maui.Toolkit.SegmentedControl;assembly=Syncfusion.Maui.Toolkit"
     xmlns:pages="clr-namespace:appEmpamedic.Pages"
     Shell.FlyoutBehavior="Flyout"
-    Title="appEmpamedic">
+    Title="EMPAMEDIC">
+
+    <!-- Primera pantalla: no aparece en el menú lateral -->
+    <ShellContent
+        Title="Iniciar sesión"
+        ContentTemplate="{DataTemplate pages:LoginPage}"
+        FlyoutItemIsVisible="False"
+        Route="login" />
 
     <ShellContent
         Title="Dashboard"
         Icon="{StaticResource IconDashboard}"
-        ContentTemplate="{DataTemplate pages:MainPage}"
-        Route="main" />
+        ContentTemplate="{DataTemplate pages:DashboardPage}"
+        Route="dashboard" />
 
     <ShellContent
-        Title="Projects"
-        Icon="{StaticResource IconProjects}"
-        ContentTemplate="{DataTemplate pages:ProjectListPage}"
-        Route="projects" />
+        Title="Pacientes"
+        Icon="{StaticResource IconPacientes}"
+        ContentTemplate="{DataTemplate pages:PacientesPage}"
+        Route="pacientes" />
 
     <ShellContent
-        Title="Manage Meta"
-        Icon="{StaticResource IconMeta}"
-        ContentTemplate="{DataTemplate pages:ManageMetaPage}"
-        Route="manage" />
+        Title="Consultas"
+        Icon="{StaticResource IconConsultas}"
+        ContentTemplate="{DataTemplate pages:ConsultasPage}"
+        Route="consultas" />
+
+    <ShellContent
+        Title="Inventario"
+        Icon="{StaticResource IconInventario}"
+        ContentTemplate="{DataTemplate pages:InventarioPage}"
+        Route="inventario" />
 
     <Shell.FlyoutFooter>
         <Grid Padding="15">
-            <sf:SfSegmentedControl x:Name="ThemeSegmentedControl" 
+            <sf:SfSegmentedControl x:Name="ThemeSegmentedControl"
                 VerticalOptions="Center" HorizontalOptions="Center" SelectionChanged="SfSegmentedControl_SelectionChanged"
                 SegmentWidth="40" SegmentHeight="40">
                 <sf:SfSegmentedControl.ItemsSource>
