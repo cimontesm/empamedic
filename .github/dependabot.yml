@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # Paquetes NuGet: un solo PR semanal con las actualizaciones menores y parches.
+  - package-ecosystem: nuget
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      nuget-menores:
+        update-types: [minor, patch]
+    ignore:
+      # El backend debe quedarse en .NET 8: no proponer versiones mayores de paquetes de Microsoft.
+      - dependency-name: "Microsoft.*"
+        update-types: ["version-update:semver-major"]
+
+  # Versiones de las acciones usadas en el CI.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly

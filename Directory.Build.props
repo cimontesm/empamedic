@@ -1,0 +1,15 @@
+<Project>
+  <!-- Configuración común para todos los proyectos del repositorio. -->
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Analizadores de calidad de .NET y reglas de estilo del .editorconfig al compilar -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Las advertencias de nulos se tratan como error para evitar NullReferenceException -->
+    <WarningsAsErrors>$(WarningsAsErrors);nullable</WarningsAsErrors>
+  </PropertyGroup>
+</Project>
