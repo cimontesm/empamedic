@@ -1,8 +1,8 @@
+using backWeb.Data;
+using backWeb.DTOs;
+using backWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using backWeb.Data;
-using backWeb.Models;
-using backWeb.DTOs;
 
 namespace backWeb.Controllers;
 
