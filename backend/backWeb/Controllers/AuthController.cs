@@ -64,6 +64,10 @@ public class AuthController : ControllerBase
         _context.Usuarios.Add(nuevoUsuario);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(Login), new { id = nuevoUsuario.IdUsuario }, new { mensaje = "Usuario registrado con éxito." });
+        return Ok(new
+        {
+            mensaje = "Usuario registrado con éxito.",
+            idUsuario = nuevoUsuario.IdUsuario
+        });
     }
 }
