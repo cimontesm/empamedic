@@ -1,6 +1,7 @@
 using backWeb.Data;
 using backWeb.DTOs;
 using backWeb.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,7 @@ namespace backWeb.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly PasswordHasher<Usuario> _hasher = new();
 
     public AuthController(AppDbContext context)
     {
@@ -34,10 +36,27 @@ public class AuthController : ControllerBase
             return Unauthorized(new { mensaje = "Credenciales incorrectas o usuario inactivo." });
         }
 
-        // Verificación básica de contraseña (cumplimiento RF01)
-        if (usuario.PasswordHash != request.Password)
+        // Verificación de contraseña:
+        // 1. Intenta verificar con hash PBKDF2 (RNF03)
+        // 2. Soporte de contingencia: si la contraseña en BD aún estaba en texto plano, valida y actualiza al nuevo hash
+        var resultadoHash = _hasher.VerifyHashedPassword(usuario, usuario.PasswordHash, request.Password);
+
+        if (resultadoHash == PasswordVerificationResult.Failed)
         {
-            return Unauthorized(new { mensaje = "Credenciales incorrectas." });
+            if (usuario.PasswordHash == request.Password)
+            {
+                usuario.PasswordHash = _hasher.HashPassword(usuario, request.Password);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                return Unauthorized(new { mensaje = "Credenciales incorrectas." });
+            }
+        }
+        else if (resultadoHash == PasswordVerificationResult.SuccessRehashNeeded)
+        {
+            usuario.PasswordHash = _hasher.HashPassword(usuario, request.Password);
+            await _context.SaveChangesAsync();
         }
 
         return Ok(new
@@ -60,6 +79,9 @@ public class AuthController : ControllerBase
         {
             return BadRequest(new { mensaje = "El nombre de usuario o email ya está en uso." });
         }
+
+        // Cumplimiento RNF03: Hasheado criptográfico antes de almacenar en base de datos
+        nuevoUsuario.PasswordHash = _hasher.HashPassword(nuevoUsuario, nuevoUsuario.PasswordHash);
 
         _context.Usuarios.Add(nuevoUsuario);
         await _context.SaveChangesAsync();

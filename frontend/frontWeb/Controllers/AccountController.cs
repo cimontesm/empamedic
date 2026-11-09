@@ -107,6 +107,15 @@ public class AccountController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public IActionResult ExtenderSesion()
+    {
+        // Al acceder a esta accion estando autenticado con SlidingExpiration activa,
+        // el middleware de CookieAuthentication renueva automaticamente la ventana de expiracion
+        return Ok(new { mensaje = "Sesión renovada con éxito." });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

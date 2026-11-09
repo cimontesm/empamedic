@@ -64,6 +64,39 @@
         </div>
     </footer>
 
+    <!-- Formulario oculto para el token antiforgery usado en AJAX -->
+    <form id="antiForgeryForm" style="display:none;">
+        @Html.AntiForgeryToken()
+    </form>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <!-- Modal Advertencia Inactividad (RNF06 / HU6) -->
+        <div class="modal fade" id="modalInactividad" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="modalInactividadLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title fw-bold" id="modalInactividadLabel">
+                            Aviso de Inactividad
+                        </h5>
+                    </div>
+                    <div class="modal-body text-center py-4">
+                        <p class="fs-5 mb-2">Tu sesión está a punto de expirar por inactividad.</p>
+                        <p class="text-muted mb-3">Por seguridad clínica (RNF06), la sesión se cerrará automáticamente en:</p>
+                        <div class="display-6 fw-bold text-danger mb-2" id="contadorSegundos">60s</div>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-secondary">Cerrar sesión ahora</button>
+                        </form>
+                        <button type="button" class="btn btn-primary px-4" id="btnExtenderSesion">Mantener sesión</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
@@ -73,23 +106,60 @@
     {
         <script>
                 (function () {
-                    // RNF06: Tiempo limite de 10 minutos (600,000 ms)
-                    const TIEMPO_LIMITE_MS = 10 * 60 * 1000;
-                    let temporizador;
+                    // 9 minutos = 540,000 ms (Aviso) | 10 minutos = 600,000 ms (Cierre)
+                    const TIEMPO_AVISO_MS = 9 * 60 * 1000;
+                    const TIEMPO_CIERRE_MS = 10 * 60 * 1000;
 
-                    function reiniciarTemporizador() {
-                        clearTimeout(temporizador);
-                        temporizador = setTimeout(cerrarSesionPorInactividad, TIEMPO_LIMITE_MS);
+                    let timeoutAviso;
+                    let timeoutCierre;
+                    let intervaloConteo;
+                    const modalElement = document.getElementById('modalInactividad');
+                    let bsModal = null;
+
+                    function reiniciarTemporizadores() {
+                        clearTimeout(timeoutAviso);
+                        clearTimeout(timeoutCierre);
+                        clearInterval(intervaloConteo);
+
+                        if (bsModal) {
+                            bsModal.hide();
+                        }
+
+                        timeoutAviso = setTimeout(mostrarAviso, TIEMPO_AVISO_MS);
+                        timeoutCierre = setTimeout(forzarCierre, TIEMPO_CIERRE_MS);
                     }
 
-                    function cerrarSesionPorInactividad() {
-                        alert("Su sesión ha expirado por 10 minutos de inactividad.");
+                    function mostrarAviso() {
+                        if (!bsModal && typeof bootstrap !== 'undefined' && modalElement) {
+                            bsModal = new bootstrap.Modal(modalElement);
+                        }
+                        if (bsModal) {
+                            bsModal.show();
+                        }
 
+                        let segundosRestantes = 60;
+                        const display = document.getElementById('contadorSegundos');
+                        if (display) {
+                            display.innerText = segundosRestantes + "s";
+                        }
+
+                        intervaloConteo = setInterval(() => {
+                            segundosRestantes--;
+                            if (display && segundosRestantes >= 0) {
+                                display.innerText = segundosRestantes + "s";
+                            }
+                            if (segundosRestantes <= 0) {
+                                clearInterval(intervaloConteo);
+                            }
+                        }, 1000);
+                    }
+
+                    function forzarCierre() {
                         const form = document.createElement("form");
                         form.method = "post";
-                        form.action = "/Account/Logout";
+                        form.action = "@Url.Action("Logout", "Account")";
 
-                        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                        const tokenInput = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]');
                         if (tokenInput) {
                             const tokenClon = tokenInput.cloneNode();
                             form.appendChild(tokenClon);
@@ -99,10 +169,36 @@
                         form.submit();
                     }
 
+                    // Reinicia el temporizador si el modal no se está mostrando
                     const eventosActividad = ["mousemove", "mousedown", "keydown", "touchstart", "scroll"];
-                    eventosActividad.forEach(evento => window.addEventListener(evento, reiniciarTemporizador, true));
+                    eventosActividad.forEach(evento => {
+                        window.addEventListener(evento, () => {
+                            if (!modalElement || !modalElement.classList.contains('show')) {
+                                reiniciarTemporizadores();
+                            }
+                        }, true);
+                    });
 
-                    reiniciarTemporizador();
+                    // Acción de botón "Mantener sesión"
+                    const btnExtender = document.getElementById('btnExtenderSesion');
+                    if (btnExtender) {
+                        btnExtender.addEventListener('click', function () {
+                            const token = document.querySelector('#antiForgeryForm input[name="__RequestVerificationToken"]').value;
+
+                            fetch('@Url.Action("ExtenderSesion", "Account")', {
+                                method: 'POST',
+                                headers: {
+                                    'RequestVerificationToken': token
+                                }
+                            }).then(() => {
+                                reiniciarTemporizadores();
+                            }).catch(() => {
+                                reiniciarTemporizadores();
+                            });
+                        });
+                    }
+
+                    reiniciarTemporizadores();
                 })();
         </script>
     }
