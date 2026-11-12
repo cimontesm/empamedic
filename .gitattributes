@@ -1,0 +1,12 @@
+# Normaliza saltos de línea: LF dentro del repositorio, el sistema de cada uno al hacer checkout.
+* text=auto
+
+*.sln text eol=crlf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary

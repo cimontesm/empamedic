@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Backend y frontend (.NET 8)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restaurar paquetes
+        run: |
+          dotnet restore backend/backWeb.Tests/backWeb.Tests.csproj
+          dotnet restore frontend/frontWeb/frontWeb.csproj
+
+      - name: Compilar
+        run: |
+          dotnet build backend/backWeb.Tests/backWeb.Tests.csproj -c Release --no-restore
+          dotnet build frontend/frontWeb/frontWeb.csproj -c Release --no-restore
+
+      - name: Pruebas
+        run: dotnet test backend/backWeb.Tests/backWeb.Tests.csproj -c Release --no-build --logger "console;verbosity=normal"
+
+      - name: Verificar formato (.editorconfig)
+        run: |
+          dotnet format backend/backWeb/backWeb.csproj --verify-no-changes --severity warn --no-restore
+          dotnet format backend/backWeb.Tests/backWeb.Tests.csproj --verify-no-changes --severity warn --no-restore
+          dotnet format frontend/frontWeb/frontWeb.csproj --verify-no-changes --severity warn --no-restore
+
+  app:
+    name: App móvil (MAUI Android)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Instalar workload de MAUI Android
+        run: dotnet workload install maui-android
+
+      - name: Compilar app (Android)
+        run: dotnet build app/appEmpamedic/appEmpamedic.csproj -f net9.0-android -c Release
