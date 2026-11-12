@@ -24,27 +24,38 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 
-    // Aplica migraciones pendientes y crea usuario inicial de prueba si la BD está vacía
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    context.Database.Migrate();
-
-    if (!context.Usuarios.Any())
+    // Aplica migraciones pendientes y crea usuario inicial de prueba si hay conexión a BD
+    try
     {
-        var hasher = new PasswordHasher<Usuario>();
-        var admin = new Usuario
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        if (context.Database.IsRelational() && !string.IsNullOrEmpty(context.Database.GetConnectionString()))
         {
-            Nombre = "Mateo",
-            Apellido = "Zambrano",
-            Username = "mateo.zambrano@empamedic.com",
-            Email = "mateo.zambrano@empamedic.com",
-            Rol = RolUsuario.ADMINISTRADOR,
-            Activo = true
-        };
-        admin.PasswordHash = hasher.HashPassword(admin, "Admin123*");
+            context.Database.Migrate();
 
-        context.Usuarios.Add(admin);
-        context.SaveChanges();
+            if (!context.Usuarios.Any())
+            {
+                var hasher = new PasswordHasher<Usuario>();
+                var admin = new Usuario
+                {
+                    Nombre = "Mateo",
+                    Apellido = "Zambrano",
+                    Username = "mateo.zambrano@empamedic.com",
+                    Email = "mateo.zambrano@empamedic.com",
+                    Rol = RolUsuario.ADMINISTRADOR,
+                    Activo = true
+                };
+                admin.PasswordHash = hasher.HashPassword(admin, "Admin123*");
+
+                context.Usuarios.Add(admin);
+                context.SaveChanges();
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        // Evita que fallen las pruebas de integración (CI/CD) cuando no hay instancia de SQL Server
+        app.Logger.LogWarning(ex, "Omitiendo migración/seed automático porque no hay base de datos disponible.");
     }
 }
 else
