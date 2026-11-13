@@ -35,13 +35,18 @@ public class ReportService : IReportService
             FechaFin = fechaFin.Date,
 
             TotalColaboradoresAtendidos = consultas
-                .Select(c => c.PacienteId)
+                .Select(c => c.CedulaPaciente)
                 .Distinct()
                 .Count(),
 
             TotalAtenciones = consultas.Count,
 
+            AtencionesConReposo = consultas.Count(c => c.DiasReposo > 0),
+            
             TotalDiasReposo = consultas.Sum(c => c.DiasReposo),
+
+            MedicamentosRecetados = consultas
+                .Count(c => !string.IsNullOrWhiteSpace(c.MedicinaRecetada)),
 
             DiagnosticosFrecuentes = diagnosticos,
 

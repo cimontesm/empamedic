@@ -11,6 +11,20 @@ builder.Services.AddSwaggerGen();
 
 //Servicio de reportes
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IReportExportService, ReportExportService>();
+
+// CORS: permite que el frontend MVC (frontWeb) consuma este API en desarrollo.
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PermitirFrontend", policy =>
+    {
+        policy.WithOrigins(
+            "http://localhost:5042", 
+            "https://localhost:7288")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 var app = builder.Build();
 
@@ -22,6 +36,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("PermitirFrontend");
 
 app.UseAuthorization();
 

@@ -4,3 +4,14 @@ GET {{backWeb_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+### Reportes ###
+
+GET {{backWeb_HostAddress}}/api/reports/resumen?fechaInicio=2026-11-01&fechaFin=2026-11-12
+Accept: application/json
+
+###
+
+GET {{backWeb_HostAddress}}/api/reports/exportar/xlsx?fechaInicio=2026-11-01&fechaFin=2026-11-12
+
+###

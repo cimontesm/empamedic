@@ -11,8 +11,12 @@ public class ReporteResumenDto
 
     public int TotalAtenciones { get; set; }
 
+    public int AtencionesConReposo { get; set; }
+    
     public int TotalDiasReposo { get; set; }
 
+    public int MedicamentosRecetados { get; set; }
+    
     public List<DiagnosticoFrecuenteDto> DiagnosticosFrecuentes { get; set; } = new();
 
     public List<ConsultaMedica> DetalleAtenciones { get; set; } = new();
