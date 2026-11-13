@@ -10,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EmpamedicDb")));
 
+builder.Services.AddServiciosConsultaMedica();
+
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
 
