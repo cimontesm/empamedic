@@ -15,6 +15,13 @@ namespace backWeb.Data
         {
         }
 
+        // Punto 3: catálogo de medicamentos y plantillas de receta.
+        public DbSet<Medicamento> Medicamentos => Set<Medicamento>();
+
+        public DbSet<PlantillaReceta> PlantillasReceta => Set<PlantillaReceta>();
+
+        public DbSet<DetallePlantillaReceta> DetallesPlantillaReceta => Set<DetallePlantillaReceta>();
+
         public DbSet<Usuario> Usuarios => Set<Usuario>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
