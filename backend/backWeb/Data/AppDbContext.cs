@@ -22,6 +22,8 @@ namespace backWeb.Data
 
         public DbSet<DetallePlantillaReceta> DetallesPlantillaReceta => Set<DetallePlantillaReceta>();
 
+        public DbSet<Usuario> Usuarios => Set<Usuario>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
