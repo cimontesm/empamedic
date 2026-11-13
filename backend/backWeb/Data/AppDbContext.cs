@@ -17,6 +17,8 @@ namespace backWeb.Data
 
         public DbSet<Usuario> Usuarios => Set<Usuario>();
 
+        public DbSet<Colaborador> Colaboradores => Set<Colaborador>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
