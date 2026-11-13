@@ -1,3 +1,4 @@
+using backWeb.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace backWeb.Data
@@ -14,8 +15,12 @@ namespace backWeb.Data
         {
         }
 
-        // Ejemplo:
-        // public DbSet<Colaborador> Colaboradores => Set<Colaborador>();
+        // Punto 3: catálogo de medicamentos y plantillas de receta.
+        public DbSet<Medicamento> Medicamentos => Set<Medicamento>();
+
+        public DbSet<PlantillaReceta> PlantillasReceta => Set<PlantillaReceta>();
+
+        public DbSet<DetallePlantillaReceta> DetallesPlantillaReceta => Set<DetallePlantillaReceta>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
