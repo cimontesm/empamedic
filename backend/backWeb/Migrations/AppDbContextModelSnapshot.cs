@@ -21,6 +21,115 @@ namespace backWeb.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("backWeb.Models.DetallePlantillaReceta", b =>
+                {
+                    b.Property<int>("IdDetallePlantilla")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdDetallePlantilla"));
+
+                    b.Property<string>("DosisSugerida")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("DuracionSugerida")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FrecuenciaSugerida")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("IndicacionesSugeridas")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("MedicamentoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PlantillaRecetaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("IdDetallePlantilla");
+
+                    b.HasIndex("MedicamentoId");
+
+                    b.HasIndex("PlantillaRecetaId");
+
+                    b.ToTable("DetallesPlantillaReceta", (string)null);
+                });
+
+            modelBuilder.Entity("backWeb.Models.Medicamento", b =>
+                {
+                    b.Property<int>("IdMedicamento")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdMedicamento"));
+
+                    b.Property<string>("Concentracion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("NombreComercial")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Presentacion")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PrincipioActivo")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("IdMedicamento");
+
+                    b.HasIndex("NombreComercial");
+
+                    b.ToTable("Medicamentos", (string)null);
+                });
+
+            modelBuilder.Entity("backWeb.Models.PlantillaReceta", b =>
+                {
+                    b.Property<int>("IdPlantilla")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdPlantilla"));
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("DiagnosticoAsociado")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NombrePlantilla")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("IdPlantilla");
+
+                    b.HasIndex("NombrePlantilla")
+                        .IsUnique();
+
+                    b.ToTable("PlantillasReceta", (string)null);
+                });
+
             modelBuilder.Entity("backWeb.Models.Usuario", b =>
                 {
                     b.Property<int>("IdUsuario")
@@ -58,6 +167,35 @@ namespace backWeb.Migrations
                     b.HasKey("IdUsuario");
 
                     b.ToTable("Usuarios");
+                });
+
+            modelBuilder.Entity("backWeb.Models.DetallePlantillaReceta", b =>
+                {
+                    b.HasOne("backWeb.Models.Medicamento", "Medicamento")
+                        .WithMany("DetallesPlantilla")
+                        .HasForeignKey("MedicamentoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("backWeb.Models.PlantillaReceta", "Plantilla")
+                        .WithMany("Items")
+                        .HasForeignKey("PlantillaRecetaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Medicamento");
+
+                    b.Navigation("Plantilla");
+                });
+
+            modelBuilder.Entity("backWeb.Models.Medicamento", b =>
+                {
+                    b.Navigation("DetallesPlantilla");
+                });
+
+            modelBuilder.Entity("backWeb.Models.PlantillaReceta", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }
