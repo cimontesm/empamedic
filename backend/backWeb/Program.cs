@@ -1,5 +1,7 @@
 using backWeb.Data;
 using backWeb.Models;
+using backWeb.Services;
+using backWeb.Workers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +11,14 @@ var builder = WebApplication.CreateBuilder(args);
 // o de "dotnet user-secrets" (ver README). Nunca se guardan contraseñas en el repositorio.
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EmpamedicDb")));
+
+// Seguimiento y alertas de control médico (RF08)
+builder.Services.Configure<SeguimientoOptions>(builder.Configuration.GetSection(SeguimientoOptions.Seccion));
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<ISeguimientoService, SeguimientoService>();
+// Provisional: solo registra en el log. Cambiar por la implementación con Firebase cuando exista.
+builder.Services.AddSingleton<INotificacionPushService, LogNotificacionPushService>();
+builder.Services.AddHostedService<RecordatorioSeguimientoWorker>();
 
 builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
