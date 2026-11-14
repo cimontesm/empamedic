@@ -1,0 +1,51 @@
+@model IEnumerable<frontWeb.Models.ColaboradorViewModel>
+
+@{
+    ViewData["Title"] = "Colaboradores / Pacientes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Gestión de Colaboradores</h2>
+    <a asp-action="Create" class="btn btn-primary">+ Nuevo Colaborador</a>
+</div>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Cédula</th>
+            <th>Nombres y Apellidos</th>
+            <th>Tipo de Sangre</th>
+            <th>Alergias</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Cedula</td>
+                <td>@item.Nombres @item.Apellidos</td>
+                <td><span class="badge bg-danger">@item.TipoSangre</span></td>
+                <td>@(string.IsNullOrEmpty(item.Alergias) ? "Ninguna" : item.Alergias)</td>
+                <td>
+                    @if (item.Activo)
+                    {
+                        <span class="badge bg-success">Activo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inactivo</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white">Ficha</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que deseas eliminar este registro?');">
+                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
