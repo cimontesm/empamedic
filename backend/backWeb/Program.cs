@@ -1,4 +1,6 @@
 using backWeb.Data;
+using backWeb.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,12 +23,48 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    // Aplica migraciones pendientes y crea usuario inicial de prueba si hay conexión a BD
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        if (context.Database.IsRelational() && !string.IsNullOrEmpty(context.Database.GetConnectionString()))
+        {
+            context.Database.Migrate();
+
+            if (!context.Usuarios.Any())
+            {
+                var hasher = new PasswordHasher<Usuario>();
+                var admin = new Usuario
+                {
+                    Nombre = "Mateo",
+                    Apellido = "Zambrano",
+                    Username = "mateo.zambrano@empamedic.com",
+                    Email = "mateo.zambrano@empamedic.com",
+                    Rol = RolUsuario.ADMINISTRADOR,
+                    Activo = true
+                };
+                admin.PasswordHash = hasher.HashPassword(admin, "Admin123*");
+
+                context.Usuarios.Add(admin);
+                context.SaveChanges();
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        // Evita que fallen las pruebas de integración (CI/CD) cuando no hay instancia de SQL Server
+        app.Logger.LogWarning(ex, "Omitiendo migración/seed automático porque no hay base de datos disponible.");
+    }
+}
+else
+{
+    // En desarrollo usamos HTTP (5164) para evitar bloqueos de certificados SSL locales entre front y back
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 app.MapHealthChecks("/health");
 
