@@ -32,9 +32,18 @@ namespace appEmpamedic
     		builder.Services.AddLogging(configure => configure.AddDebug());
 #endif
 
-            // Servicios. Cambiar MockEmpamedicApi por la implementación HTTP cuando exista el backend.
-            builder.Services.AddSingleton<IEmpamedicApi, MockEmpamedicApi>();
+            // Servicios: datos simulados o API real según ApiConfig.UsarDatosSimulados.
+            builder.Services.AddSingleton(new HttpClient
+            {
+                BaseAddress = ApiConfig.UrlBase,
+                Timeout = ApiConfig.TiempoEspera
+            });
             builder.Services.AddSingleton<SesionService>();
+            builder.Services.AddSingleton<MockEmpamedicApi>();
+            if (ApiConfig.UsarDatosSimulados)
+                builder.Services.AddSingleton<IEmpamedicApi>(sp => sp.GetRequiredService<MockEmpamedicApi>());
+            else
+                builder.Services.AddSingleton<IEmpamedicApi, HttpEmpamedicApi>();
             builder.Services.AddSingleton<IErrorHandler, ModalErrorHandler>();
 
             // Páginas principales (Shell las crea y resuelve sus PageModels)

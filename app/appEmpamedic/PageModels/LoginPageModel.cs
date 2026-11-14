@@ -35,9 +35,10 @@ namespace appEmpamedic.PageModels
                 IsBusy = true;
                 MensajeError = null;
 
-                if (!await _sesion.IniciarSesionAsync(Usuario, Clave))
+                var resultado = await _sesion.IniciarSesionAsync(Usuario, Clave);
+                if (!resultado.Exito)
                 {
-                    MensajeError = "Ingrese usuario y contraseña.";
+                    MensajeError = resultado.Mensaje;
                     return;
                 }
 
