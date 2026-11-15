@@ -1,0 +1,39 @@
+@model frontWeb.Models.ColaboradorViewModel
+
+@{
+    ViewData["Title"] = "Ficha del Colaborador";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Ficha Clínica: @Model.Nombres @Model.Apellidos</h4>
+        <span class="badge bg-light text-dark fs-6">C.I. @Model.Cedula</span>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Fecha de Nacimiento</dt>
+            <dd class="col-sm-9">@Model.FechaNacimiento.ToString("dd/MM/yyyy")</dd>
+
+            <dt class="col-sm-3">Tipo de Sangre</dt>
+            <dd class="col-sm-9"><span class="badge bg-danger fs-6">@Model.TipoSangre</span></dd>
+
+            <dt class="col-sm-3">Alergias</dt>
+            <dd class="col-sm-9 text-danger fw-bold">
+                @(string.IsNullOrEmpty(Model.Alergias) ? "No registra alergias" : Model.Alergias)
+            </dd>
+
+            <dt class="col-sm-3">Teléfono</dt>
+            <dd class="col-sm-9">@(Model.Telefono ?? "No registrado")</dd>
+
+            <dt class="col-sm-3">Cargo / Área</dt>
+            <dd class="col-sm-9">@(Model.Cargo ?? "No asignado")</dd>
+
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">@(Model.Activo ? "Activo" : "Inactivo")</dd>
+        </dl>
+    </div>
+    <div class="card-footer">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Editar Datos</a>
+        <a asp-action="Index" class="btn btn-secondary">Volver al Listado</a>
+    </div>
+</div>

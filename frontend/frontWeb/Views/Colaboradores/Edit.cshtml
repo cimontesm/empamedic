@@ -1,0 +1,86 @@
+@model frontWeb.Models.ColaboradorViewModel
+
+@{
+    ViewData["Title"] = "Editar Colaborador";
+}
+
+<h2>Editar Datos del Colaborador</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Cedula" class="form-label"></label>
+                    <input asp-for="Cedula" class="form-control" maxlength="10" />
+                    <span asp-validation-for="Cedula" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="FechaNacimiento" class="form-label"></label>
+                    <input asp-for="FechaNacimiento" class="form-control" type="date" />
+                    <span asp-validation-for="FechaNacimiento" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label asp-for="Nombres" class="form-label"></label>
+                    <input asp-for="Nombres" class="form-control" />
+                    <span asp-validation-for="Nombres" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Apellidos" class="form-label"></label>
+                    <input asp-for="Apellidos" class="form-control" />
+                    <span asp-validation-for="Apellidos" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label asp-for="TipoSangre" class="form-label"></label>
+                    <select asp-for="TipoSangre" class="form-select">
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Telefono" class="form-label"></label>
+                    <input asp-for="Telefono" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Cargo" class="form-label"></label>
+                    <input asp-for="Cargo" class="form-control" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Alergias" class="form-label"></label>
+                <textarea asp-for="Alergias" class="form-control" rows="2"></textarea>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="Activo" class="form-check-input" />
+                <label asp-for="Activo" class="form-check-label"></label>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Actualizar Cambios</button>
+                <a asp-action="Index" class="btn btn-secondary">Volver</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
