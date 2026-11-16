@@ -1,9 +1,19 @@
+using frontWeb.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-var app = builder.Build();
+// --- Cliente HTTP hacia el backend (backWeb). El frontend MVC no toca ninguna
+// base de datos directamente: todos los datos pasan por este cliente. ---
+builder.Services.AddHttpClient<IReportesApiClient, ReportesApiClient>(client =>
+{
+    var baseUrl = builder.Configuration["BackendApi:BaseUrl"]
+        ?? throw new InvalidOperationException("Falta configurar 'BackendApi:BaseUrl' en appsettings.json");
+    client.BaseAddress = new Uri(baseUrl);
+    client.Timeout = TimeSpan.FromSeconds(10);
+}); var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

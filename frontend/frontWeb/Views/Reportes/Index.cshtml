@@ -1,0 +1,156 @@
+@model frontWeb.Models.ReportesPageViewModel
+@{
+    ViewData["Title"] = "Reportes";
+}
+
+<h2 class="mb-1">Reportes globales</h2>
+<p class="text-muted">Estadísticas consolidadas del dispensario y exportación de datos</p>
+
+@if (!string.IsNullOrEmpty(Model.MensajeError))
+{
+<div class="alert alert-warning" role="alert">@Model.MensajeError</div>
+}
+
+@if (TempData["MensajeError"] is string mensajeExportacion)
+{
+<div class="alert alert-danger" role="alert">@mensajeExportacion</div>
+}
+
+<div class="card p-3 mb-4">
+    <form asp-action="Index" method="get" class="row g-3 align-items-end">
+        <div class="col-auto">
+            <label asp-for="FechaInicio" class="form-label">Desde</label>
+            <input asp-for="FechaInicio" type="date" class="form-control" />
+        </div>
+        <div class="col-auto">
+            <label asp-for="FechaFin" class="form-label">Hasta</label>
+            <input asp-for="FechaFin" type="date" class="form-control" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+        <div class="col-auto">
+            <a class="btn btn-primary"
+               href="@Url.Action("ExportarExcel", new { fechaInicio = Model.FechaInicio.ToString("yyyy-MM-dd"), fechaFin = Model.FechaFin.ToString("yyyy-MM-dd") })">
+                Exportar a Excel (.xlsx)
+            </a>
+        </div>
+    </form>
+
+    @{
+        var hoy = DateTime.Today;
+    }
+    <!-- Accesos rápidos: minimizan clics para el personal médico (RNF02) -->
+    <div class="d-flex gap-2 flex-wrap mt-3">
+        <a class="btn btn-sm btn-outline-secondary rounded-pill"
+           href="@Url.Action("Index", new { fechaInicio = hoy.AddDays(-7).ToString("yyyy-MM-dd"), fechaFin = hoy.ToString("yyyy-MM-dd") })">Última semana</a>
+        <a class="btn btn-sm btn-outline-secondary rounded-pill"
+           href="@Url.Action("Index", new { fechaInicio = hoy.AddDays(-30).ToString("yyyy-MM-dd"), fechaFin = hoy.ToString("yyyy-MM-dd") })">Últimos 30 días</a>
+        <a class="btn btn-sm btn-outline-secondary rounded-pill"
+           href="@Url.Action("Index", new { fechaInicio = new DateTime(hoy.Year, hoy.Month, 1).ToString("yyyy-MM-dd"), fechaFin = hoy.ToString("yyyy-MM-dd") })">Mes actual</a>
+        <a class="btn btn-sm btn-outline-secondary rounded-pill"
+           href="@Url.Action("Index", new { fechaInicio = hoy.AddYears(-1).ToString("yyyy-MM-dd"), fechaFin = hoy.ToString("yyyy-MM-dd") })">Último año</a>
+    </div>
+</div>
+
+@if (Model.Resumen is not null)
+{
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold">@Model.Resumen.TotalColaboradoresAtendidos</div>
+            <div class="text-muted small">Pacientes atendidos</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold">@Model.Resumen.AtencionesConReposo</div>
+            <div class="text-muted small">Atenciones con reposo</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold">@Model.Resumen.TotalDiasReposo</div>
+            <div class="text-muted small">Días totales de reposo</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center p-3">
+            <div class="fs-3 fw-bold">@Model.Resumen.MedicamentosEntregados</div>
+            <div class="text-muted small">Medicamentos entregados</div>
+        </div>
+    </div>
+</div>
+
+<div class="card p-3 mb-4">
+    <h6>Diagnósticos más frecuentes</h6>
+    @if (Model.Resumen.DiagnosticosFrecuentes.Any())
+        {
+    <canvas id="chartDiagnosticos" height="100"></canvas>
+        }
+        else
+        {
+    <p class="text-muted mb-0">No hay diagnósticos registrados en el rango seleccionado.</p>
+        }
+</div>
+
+<div class="card p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0">Detalle de atenciones</h6>
+        <a class="small text-decoration-none"
+           href="@Url.Action("ExportarExcel", new { fechaInicio = Model.FechaInicio.ToString("yyyy-MM-dd"), fechaFin = Model.FechaFin.ToString("yyyy-MM-dd") })">
+            ? Descargar
+        </a>
+    </div>
+
+    @if (Model.Resumen.DetalleAtenciones.Any())
+        {
+    foreach (var item in Model.Resumen.DetalleAtenciones)
+            {
+    <div class="border rounded p-3 mb-2">
+        <div class="fw-semibold">@item.NombrePaciente · @item.Diagnostico</div>
+        <div class="text-muted small">
+            @item.FechaConsulta.ToString("dd/MM/yyyy HH:mm") · @item.MotivoConsulta
+            @if (item.DiasReposo > 0)
+                        {
+            <text>· @item.DiasReposo día(s) de reposo</text>
+                        }
+        </div>
+    </div>
+            }
+        }
+        else
+        {
+    <p class="text-muted mb-0">No hay atenciones registradas en el rango seleccionado.</p>
+        }
+</div>
+}
+
+@section Scripts {
+    <!--
+        Chart.js vía CDN. Si prefieres la misma convención de bootstrap/jquery
+        (archivos locales en wwwroot/lib), en Visual Studio: clic derecho en el
+        proyecto > Add > Client-Side Library > busca "chart.js".
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+    @if (Model.Resumen is not null && Model.Resumen.DiagnosticosFrecuentes.Any())
+    {
+    <script>
+            const diagnosticosLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Resumen.DiagnosticosFrecuentes.Select(d => d.Diagnostico)));
+            const diagnosticosData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Resumen.DiagnosticosFrecuentes.Select(d => d.Cantidad)));
+
+            new Chart(document.getElementById('chartDiagnosticos'), {
+                type: 'bar',
+                data: {
+                    labels: diagnosticosLabels,
+                    datasets: [{ label: 'Casos', data: diagnosticosData, backgroundColor: '#0d6efd' }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+                }
+            });
+    </script>
+    }
+}
