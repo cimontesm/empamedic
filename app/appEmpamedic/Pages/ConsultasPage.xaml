@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:pageModels="clr-namespace:appEmpamedic.PageModels"
+             xmlns:models="clr-namespace:appEmpamedic.Models"
+             x:Class="appEmpamedic.Pages.ConsultasPage"
+             x:DataType="pageModels:ConsultasPageModel"
+             Title="Consultas">
+
+    <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding CargarCommand}" Padding="{StaticResource LayoutPadding}">
+        <CollectionView ItemsSource="{Binding Consultas}" SelectionMode="None">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.EmptyView>
+                <Label Text="No hay consultas registradas." Style="{StaticResource Body2}" HorizontalOptions="Center" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:ConsultaMedica">
+                    <Border>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding VerPacienteCommand, Source={RelativeSource AncestorType={x:Type pageModels:ConsultasPageModel}}, x:DataType=pageModels:ConsultasPageModel}"
+                                CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Text="{Binding NombreColaborador}" Style="{StaticResource Body1Strong}" />
+                            <Label Text="{Binding Fecha, StringFormat='{0:dd/MM/yyyy}'}" Style="{StaticResource Caption1}" />
+                            <Label Text="{Binding MotivoConsulta}" Style="{StaticResource Body2}" />
+                            <Label Text="{Binding Diagnostico, StringFormat='Diagnóstico: {0}'}" Style="{StaticResource Body2}" />
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+</ContentPage>

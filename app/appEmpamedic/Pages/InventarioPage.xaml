@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:pageModels="clr-namespace:appEmpamedic.PageModels"
+             xmlns:models="clr-namespace:appEmpamedic.Models"
+             x:Class="appEmpamedic.Pages.InventarioPage"
+             x:DataType="pageModels:InventarioPageModel"
+             Title="Inventario">
+
+    <RefreshView IsRefreshing="{Binding IsRefreshing}" Command="{Binding CargarCommand}" Padding="{StaticResource LayoutPadding}">
+        <CollectionView ItemsSource="{Binding Medicamentos}" SelectionMode="None">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="10" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.EmptyView>
+                <Label Text="No hay medicamentos registrados." Style="{StaticResource Body2}" HorizontalOptions="Center" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Medicamento">
+                    <Border>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="{Binding Nombre}" Style="{StaticResource Body1Strong}" />
+                                <Label Text="{Binding Presentacion}" Style="{StaticResource Caption1}" />
+                                <Label Text="Stock bajo" TextColor="#C62828" Style="{StaticResource Caption1Strong}" IsVisible="{Binding StockBajo}" />
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="{Binding StockActual}" Style="{StaticResource Title2}" HorizontalOptions="End" />
+                                <Label Text="{Binding StockMinimo, StringFormat='mín. {0}'}" Style="{StaticResource Caption1}" HorizontalOptions="End" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+</ContentPage>

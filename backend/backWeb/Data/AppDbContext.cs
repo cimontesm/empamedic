@@ -16,6 +16,7 @@ namespace backWeb.Data
         }
 
         public DbSet<Usuario> Usuarios => Set<Usuario>();
+        public DbSet<SeguimientoAlerta> SeguimientoAlertas => Set<SeguimientoAlerta>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

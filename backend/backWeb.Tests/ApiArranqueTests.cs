@@ -13,7 +13,10 @@ namespace backWeb.Tests
 
         public ApiArranqueTests(WebApplicationFactory<Program> factory)
         {
-            _factory = factory;
+            // Sin SQL Server en las pruebas: se apaga el envío automático de recordatorios (RF08)
+            // para que el proceso en segundo plano no se quede esperando la conexión.
+            _factory = factory.WithWebHostBuilder(builder =>
+                builder.UseSetting("Seguimiento:RecordatoriosHabilitados", "false"));
         }
 
         [Fact]

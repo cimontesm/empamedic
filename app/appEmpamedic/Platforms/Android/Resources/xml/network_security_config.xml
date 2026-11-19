@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  En desarrollo la API corre en HTTP (sin cifrar). Android lo bloquea por defecto,
+  así que solo se permite para la PC vista desde el emulador (10.0.2.2) y localhost.
+  Para un celular físico, agregar aquí la IP de la PC. En producción la API debe usar HTTPS.
+-->
+<network-security-config>
+  <domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="false">10.0.2.2</domain>
+    <domain includeSubdomains="false">localhost</domain>
+  </domain-config>
+</network-security-config>
